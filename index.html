@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TripArchitect — by Gargi Patel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="icon" type="image/png" href="/favicon.png"/>
+</head>
+<body>
+
+<!-- PLANE TRANSITION OVERLAY -->
+<div id="plane-overlay">
+  <div id="pt-trail-line"></div>
+  <div id="pt-plane">✈</div>
+</div>
+
+<!-- LOAD SPLASH -->
+<div id="load-splash">
+  <div id="splash-bg"></div>
+  <div id="splash-overlay"></div>
+  <div id="splash-bubbles">
+    <div class="sb"></div><div class="sb"></div><div class="sb"></div>
+    <div class="sb"></div><div class="sb"></div><div class="sb"></div>
+  </div>
+  <div id="splash-content">
+    <div id="splash-welcome">✦ &nbsp; WELCOME TO &nbsp; ✦</div>
+    <div id="splash-creator">GARGI PATEL'S</div>
+    <div id="splash-plane">✈</div>
+    <div id="splash-trail"></div>
+    <div id="splash-logo">Trip<span>Architect</span></div>
+    <div id="splash-tagline">AI-Powered Travel Planning · Plan Any Trip for Free</div>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<nav id="main-nav">
+  <div class="nav-inner">
+    <div class="nav-brand" onclick="showPage('home')"><span class="brand-icon">✈</span>Trip<span>Architect</span></div>
+    <div class="nav-links">
+      <button class="nl active" id="nav-home"     onclick="showPage('home')">Home</button>
+      <button class="nl"        id="nav-features" onclick="showPage('features')">Features</button>
+      <button class="nl"        id="nav-howto"    onclick="showPage('howto')">How It Works</button>
+      <button class="nl"        id="nav-contact"  onclick="showPage('contact')">Contact</button>
+      <button class="nl cta"    id="nav-start"    onclick="showPage('start')">Plan My Trip →</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ PAGE: HOME ══ -->
+<div class="page active" id="pg-home">
+
+  <section class="hero">
+    <div class="hero-slides">
+      <div class="hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1800&q=80')"></div>
+      <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1800&q=80')"></div>
+      <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1800&q=80')"></div>
+      <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1800&q=80')"></div>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">✦ AI-Powered Travel Planning ✦</div>
+      <h1 class="hero-title">Discover the World<br/><em>Your Way</em></h1>
+      <p class="hero-sub">Craft perfect journeys with real-time AI — itineraries, weather, maps, budgets and more.</p>
+      <div class="hero-actions">
+        <button class="hero-btn-primary" onclick="showPage('start')">Start Planning Free →</button>
+        <button class="hero-btn-secondary" onclick="showPage('features')">See Features</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><span class="hstat-n">195+</span><span class="hstat-l">Countries</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">10K+</span><span class="hstat-l">Itineraries</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">4.9★</span><span class="hstat-l">Rating</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">100%</span><span class="hstat-l">Free</span></div>
+      </div>
+    </div>
+    <div class="slide-dots">
+      <span class="sdot active" onclick="goSlide(0)"></span>
+      <span class="sdot" onclick="goSlide(1)"></span>
+      <span class="sdot" onclick="goSlide(2)"></span>
+      <span class="sdot" onclick="goSlide(3)"></span>
+    </div>
+  </section>
+
+  <!-- SCROLL PEEK TEASER — shows just above fold to invite scrolling -->
+  <section class="scroll-peek">
+    <div class="scroll-peek-inner">
+      <div class="sp-left">
+        <div class="sp-line"></div>
+        <span class="sp-text">Scroll to explore</span>
+        <div class="sp-arrow">
+          <div class="sp-chevron"></div>
+          <div class="sp-chevron"></div>
+          <div class="sp-chevron"></div>
+        </div>
+      </div>
+      <div class="sp-teasers">
+        <div class="sp-teaser"><span>🌍</span><strong>9 Destinations</strong><span class="sp-sub">Featured below</span></div>
+        <div class="sp-teaser"><span>✈️</span><strong>3-Step Process</strong><span class="sp-sub">See how it works</span></div>
+        <div class="sp-teaser"><span>🤖</span><strong>8 AI Features</strong><span class="sp-sub">All free forever</span></div>
+        <div class="sp-teaser"><span>💰</span><strong>Zero Cost</strong><span class="sp-sub">No credit card</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESTINATIONS -->
+  <section class="destinations-section">
+    <div class="sec-header">
+      <div class="sec-tag">✈ Popular Destinations</div>
+      <h2>Where Will You <em>Go Next?</em></h2>
+      <p>Click any destination to instantly start planning</p>
+    </div>
+    <div class="dest-grid">
+      <div class="dest-card large" onclick="quickPlan('Paris, France')">
+        <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80" alt="Paris"/>
+        <div class="dest-info"><div class="dest-tag">Europe · France</div><h3>Paris</h3><p>The City of Light & Love</p><span class="dest-plan-btn">Plan This Trip →</span></div>
+      </div>
+      <div class="dest-card" onclick="quickPlan('Bali, Indonesia')">
+        <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80" alt="Bali"/>
+        <div class="dest-info"><div class="dest-tag">Asia · Indonesia</div><h3>Bali</h3><p>Island of the Gods</p><span class="dest-plan-btn">Plan →</span></div>
+      </div>
+      <div class="dest-card" onclick="quickPlan('Tokyo, Japan')">
+        <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80" alt="Tokyo"/>
+        <div class="dest-info"><div class="dest-tag">Asia · Japan</div><h3>Tokyo</h3><p>Future Meets Tradition</p><span class="dest-plan-btn">Plan →</span></div>
+      </div>
+      <div class="dest-card" onclick="quickPlan('Santorini, Greece')">
+        <img src="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&q=80" alt="Santorini"/>
+        <div class="dest-info"><div class="dest-tag">Europe · Greece</div><h3>Santorini</h3><p>Blue Domes & Sunsets</p><span class="dest-plan-btn">Plan →</span></div>
+      </div>
+      <div class="dest-card" onclick="quickPlan('Dubai, UAE')">
+        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&q=80" alt="Dubai"/>
+        <div class="dest-info"><div class="dest-tag">Middle East · UAE</div><h3>Dubai</h3><p>City of the Future</p><span class="dest-plan-btn">Plan →</span></div>
+      </div>
+      <div class="dest-card" onclick="quickPlan('Maldives')">
+        <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&q=80" alt="Maldives"/>
+        <div class="dest-info"><div class="dest-tag">Indian Ocean</div><h3>Maldives</h3><p>Paradise on Earth</p><span class="dest-plan-btn">Plan →</span></div>
+      </div>
+      <div class="dest-card" onclick="quickPlan('Rome, Italy')">
+        <img src="https://images.unsplash.com/photo-1529260830199-42c24126f198?w=600&q=80" alt="Rome"/>
+        <div class="dest-info"><div class="dest-tag">Europe · Italy</div><h3>Rome</h3><p>The Eternal City</p><span class="dest-plan-btn">Plan →</span></div>
+      </div>
+      <div class="dest-card" onclick="quickPlan('Bangkok, Thailand')">
+        <img src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=600&q=80" alt="Bangkok"/>
+        <div class="dest-info"><div class="dest-tag">Asia · Thailand</div><h3>Bangkok</h3><p>Temples & Street Food</p><span class="dest-plan-btn">Plan →</span></div>
+      </div>
+      <div class="dest-card" onclick="quickPlan('New York, USA')">
+        <img src="https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=600&q=80" alt="New York"/>
+        <div class="dest-info"><div class="dest-tag">Americas · USA</div><h3>New York</h3><p>The City Never Sleeps</p><span class="dest-plan-btn">Plan →</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE STRIP -->
+  <div class="marquee-strip">
+    <div class="marquee-track">
+      <span>✈ Paris</span><span>🏖 Bali</span><span>🗼 Tokyo</span><span>🏛 Rome</span><span>🌊 Santorini</span><span>🌴 Maldives</span><span>🏙 Dubai</span><span>🌉 New York</span><span>🏯 Kyoto</span><span>🌁 Sydney</span><span>🌺 Bangkok</span><span>🏰 Prague</span>
+      <span>✈ Paris</span><span>🏖 Bali</span><span>🗼 Tokyo</span><span>🏛 Rome</span><span>🌊 Santorini</span><span>🌴 Maldives</span><span>🏙 Dubai</span><span>🌉 New York</span><span>🏯 Kyoto</span><span>🌁 Sydney</span><span>🌺 Bangkok</span><span>🏰 Prague</span>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials-section">
+    <div class="sec-header">
+      <div class="sec-tag">✦ Loved by Travellers</div>
+      <h2>Real <em>Experiences</em></h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p>"TripArchitect planned our entire 7-day Paris honeymoon in under a minute. The day-by-day breakdown with morning, afternoon and evening activities was absolutely perfect!"</p>
+        <div class="testi-author"><div class="testi-avatar">P</div><div><strong>Priya Sharma</strong><span>Paris Honeymoon 💑</span></div></div>
+      </div>
+      <div class="testi-card featured">
+        <div class="testi-stars">★★★★★</div>
+        <p>"I was amazed — it gave me real restaurant names, temple visiting hours, transport options. The packing list even knew Bali needs mosquito repellent. A+!"</p>
+        <div class="testi-author"><div class="testi-avatar testi-av2">R</div><div><strong>Rahul Verma</strong><span>Solo trip to Bali 🏖️</span></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p>"The budget estimator saved us so much stress. We knew exactly how much Tokyo would cost before booking flights. Used it for 3 trips now — always spot on!"</p>
+        <div class="testi-author"><div class="testi-avatar testi-av3">M</div><div><strong>Meera &amp; Arjun</strong><span>Family trip to Tokyo 👨‍👩‍👧</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section">
+    <div class="sec-header light">
+      <div class="sec-tag" style="color:rgba(255,255,255,.6)">✦ Simple Process</div>
+      <h2 style="color:#fff">Plan in <em>3 Steps</em></h2>
+    </div>
+    <div class="steps-timeline">
+      <div class="tl-line"><div class="tl-plane">✈</div></div>
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-card">
+          <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&q=80" alt="step1"/>
+          <div class="step-body"><h3>Choose Destination</h3><p>Enter any city, pick your dates, budget and travel style.</p></div>
+        </div>
+      </div>
+      <div class="step-item right">
+        <div class="step-num">02</div>
+        <div class="step-card">
+          <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=500&q=80" alt="step2"/>
+          <div class="step-body"><h3>AI Builds Your Plan</h3><p>Gemini AI crafts a detailed day-by-day itinerary with real local tips.</p></div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-card">
+          <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500&q=80" alt="step3"/>
+          <div class="step-body"><h3>Pack &amp; Travel!</h3><p>Download your plan, check packing list, grab emergency numbers and go.</p></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;padding:60px 0 80px;">
+      <button class="cta-btn" onclick="showPage('start')">Start Planning Now — It's Free →</button>
+    </div>
+  </section>
+
+  <!-- FEATURES STRIP -->
+  <section class="features-strip">
+    <div class="fstrip-inner">
+      <div class="fstrip-item"><span>🤖</span><strong>AI Itinerary</strong></div>
+      <div class="fstrip-item"><span>🌤️</span><strong>Live Weather</strong></div>
+      <div class="fstrip-item"><span>🗺️</span><strong>Interactive Map</strong></div>
+      <div class="fstrip-item"><span>🌍</span><strong>Country Info</strong></div>
+      <div class="fstrip-item"><span>🗣️</span><strong>Phrasebook</strong></div>
+      <div class="fstrip-item"><span>🧳</span><strong>Packing List</strong></div>
+      <div class="fstrip-item"><span>🚨</span><strong>Emergency</strong></div>
+      <div class="fstrip-item"><span>💰</span><strong>Budget Planner</strong></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">Trip<span>Architect</span></div>
+      <div class="footer-creator">
+        <span class="footer-made">Designed &amp; Built by</span>
+        <span class="footer-name">Gargi Patel</span>
+      </div>
+      <p class="footer-tagline">AI-powered travel planning — completely free, forever.</p>
+      <div class="footer-nav">
+        <button onclick="showPage('home')">Home</button>
+        <button onclick="showPage('features')">Features</button>
+        <button onclick="showPage('start')">Plan Trip</button>
+        <button onclick="showPage('contact')">Contact</button>
+      </div>
+      <div class="footer-copy">© 2025 TripArchitect · All rights reserved</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ PAGE: PLAN TRIP ══ -->
+<div class="page" id="pg-start">
+  <div class="page-hero" style="background-image:url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1600&q=80')">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <div class="sec-tag" style="color:rgba(255,255,255,.7)">✈ AI Trip Generator</div>
+      <h1>Plan Your <em>Dream Trip</em></h1>
+      <p>Fill in the details below — AI does the rest</p>
+    </div>
+  </div>
+
+  <div class="planner-wrap">
+    <div class="planner-card">
+      <h2 class="planner-title">Your <em>Trip Details</em></h2>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>🏙️ Destination</label>
+          <input class="inp" id="f-dest" placeholder="e.g. Paris, France · Bali, Indonesia · Tokyo, Japan..."/>
+        </div>
+        <div class="form-group">
+          <label>📅 Start Date</label>
+          <input class="inp" type="date" id="f-start"/>
+        </div>
+        <div class="form-group">
+          <label>📅 End Date</label>
+          <input class="inp" type="date" id="f-end"/>
+        </div>
+        <div class="form-group">
+          <label>👥 Travelers</label>
+          <select class="inp" id="f-travelers">
+            <option>Solo</option><option>Couple</option>
+            <option>Family (with kids)</option><option>Group of Friends</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>💰 Budget Level</label>
+          <select class="inp" id="f-budget">
+            <option>Budget (Under $50/day)</option>
+            <option>Mid-Range ($50–150/day)</option>
+            <option>Luxury ($150+/day)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="style-section">
+        <label class="style-heading">✦ Trip Style</label>
+        <div class="style-grid">
+          <div class="style-card sel" data-style="Adventure" onclick="selStyle(this)">
+            <div class="sc-bg" style="background-image:url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=300&q=70')"></div>
+            <span class="sc-emoji">🏔️</span><span class="sc-label">Adventure</span>
+          </div>
+          <div class="style-card" data-style="Relaxation" onclick="selStyle(this)">
+            <div class="sc-bg" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&q=70')"></div>
+            <span class="sc-emoji">🏖️</span><span class="sc-label">Relaxation</span>
+          </div>
+          <div class="style-card" data-style="Culture" onclick="selStyle(this)">
+            <div class="sc-bg" style="background-image:url('https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=300&q=70')"></div>
+            <span class="sc-emoji">🏛️</span><span class="sc-label">Culture</span>
+          </div>
+          <div class="style-card" data-style="Food & Culinary" onclick="selStyle(this)">
+            <div class="sc-bg" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&q=70')"></div>
+            <span class="sc-emoji">🍜</span><span class="sc-label">Food</span>
+          </div>
+          <div class="style-card" data-style="Romantic" onclick="selStyle(this)">
+            <div class="sc-bg" style="background-image:url('https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=300&q=70')"></div>
+            <span class="sc-emoji">💑</span><span class="sc-label">Romantic</span>
+          </div>
+          <div class="style-card" data-style="Budget Backpacking" onclick="selStyle(this)">
+            <div class="sc-bg" style="background-image:url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=300&q=70')"></div>
+            <span class="sc-emoji">🎒</span><span class="sc-label">Backpacking</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="gen-btn" id="gen-btn" onclick="generateTrip()">✈ Generate My Trip Plan</button>
+
+      <div class="loader" id="loader">
+        <div class="loader-runway">
+          <div class="loader-plane-el">✈</div>
+          <div class="loader-trail-el"></div>
+        </div>
+        <div class="loader-text">Crafting your perfect journey<span class="loader-dots"><span>.</span><span>.</span><span>.</span></span></div>
+        <div class="loader-steps">
+          <div class="lstep" id="lsb1">📍 Info</div>
+          <div class="lstep" id="lsb2">✈️ Itinerary</div>
+          <div class="lstep" id="lsb3">🧳 Packing</div>
+          <div class="lstep" id="lsb4">🚨 Emergency</div>
+          <div class="lstep" id="lsb5">💰 Budget</div>
+          <div class="lstep" id="lsb6">🎉 Festivals</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-box" id="result-box">
+      <div class="result-dest-header" id="result-dest-header"></div>
+      <div class="result-tabs">
+        <button class="rtab active" onclick="switchTab('itinerary',this)">📅 Itinerary</button>
+        <button class="rtab" onclick="switchTab('weather',this)">🌤️ Weather</button>
+        <button class="rtab" onclick="switchTab('country',this)">🌍 Country</button>
+        <button class="rtab" onclick="switchTab('map',this)">🗺️ Map</button>
+        <button class="rtab" onclick="switchTab('phrases',this)">🗣️ Phrases</button>
+        <button class="rtab" onclick="switchTab('packing',this)">🧳 Packing</button>
+        <button class="rtab" onclick="switchTab('emergency',this)">🚨 Emergency</button>
+        <button class="rtab" onclick="switchTab('budget',this)">💰 Budget</button>
+        <button class="rtab" onclick="switchTab('festivals',this)">🎉 Festivals</button>
+      </div>
+      <div class="rtab-content active" id="tab-itinerary"><div id="itinerary-out"></div></div>
+      <div class="rtab-content" id="tab-weather"><div id="weather-out"></div></div>
+      <div class="rtab-content" id="tab-country"><div id="country-out"></div></div>
+      <div class="rtab-content" id="tab-map"><div id="map-container"></div></div>
+      <div class="rtab-content" id="tab-phrases"><div id="phrases-out"></div></div>
+      <div class="rtab-content" id="tab-packing"><div id="packing-out"></div></div>
+      <div class="rtab-content" id="tab-emergency"><div id="emergency-out"></div></div>
+      <div class="rtab-content" id="tab-budget"><div id="budget-out"></div></div>
+      <div class="rtab-content" id="tab-festivals"><div id="festivals-out" class="prose"></div></div>
+    </div>
+
+    <div class="export-row hidden" id="export-row">
+      <button class="btn btn-dark" onclick="downloadItinerary()">📥 Download Itinerary</button>
+      <button class="btn btn-outline" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+
+  <footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Trip<span>Architect</span></div><div class="footer-creator"><span class="footer-made">Designed &amp; Built by</span><span class="footer-name">Gargi Patel</span></div><div class="footer-copy">© 2025 TripArchitect · All rights reserved</div></div></footer>
+</div>
+
+<!-- ══ PAGE: FEATURES ══ -->
+<div class="page" id="pg-features">
+  <div class="page-hero" style="background-image:url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80')">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <div class="sec-tag" style="color:rgba(255,255,255,.7)">✦ What We Offer</div>
+      <h1>Powerful <em>Features</em></h1>
+      <p>Everything you need — completely free, powered by AI</p>
+    </div>
+  </div>
+  <div class="features-page-grid">
+    <div class="feat-pg-card">
+      <div class="feat-pg-img"><img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&h=220&fit=crop&q=90" alt="AI Itinerary" onerror="this.parentNode.classList.add('feat-img-ai');this.remove()"/></div>
+      <div class="feat-pg-body"><span class="fpi">🤖</span><h3>AI Itinerary Generator</h3><p>Full day-by-day travel plans — morning, afternoon, evening — with real place names, transport tips and local secrets.</p><span class="feat-pg-tag">Gemini AI</span></div>
+    </div>
+    <div class="feat-pg-card">
+      <div class="feat-pg-img"><img src="https://images.unsplash.com/photo-1504608524841-42584120d693?w=600&h=220&fit=crop&q=90" alt="Live Weather" onerror="this.parentNode.classList.add('feat-img-weather');this.remove()"/></div>
+      <div class="feat-pg-body"><span class="fpi">🌤️</span><h3>Live Weather Forecast</h3><p>Real-time 7-day forecast with temperature, wind, humidity and UV index using Open-Meteo API. Completely free.</p><span class="feat-pg-tag">Open-Meteo API</span></div>
+    </div>
+    <div class="feat-pg-card">
+      <div class="feat-pg-img"><img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=600&h=220&fit=crop&q=90" alt="Map" onerror="this.parentNode.classList.add('feat-img-map');this.remove()"/></div>
+      <div class="feat-pg-body"><span class="fpi">🗺️</span><h3>Interactive Map</h3><p>See your destination on a live Leaflet map with custom markers. Zoom in, explore, plan routes before you go.</p><span class="feat-pg-tag">Leaflet + OSM</span></div>
+    </div>
+    <div class="feat-pg-card">
+      <div class="feat-pg-img"><img src="https://images.unsplash.com/photo-1553531384-411a247ccd73?w=600&h=220&fit=crop&q=90" alt="Packing" onerror="this.parentNode.classList.add('feat-img-pack');this.remove()"/></div>
+      <div class="feat-pg-body"><span class="fpi">🧳</span><h3>Smart Packing List</h3><p>AI-personalised packing checklist based on your destination, weather and trip style. Check off items as you pack.</p><span class="feat-pg-tag">AI-Generated</span></div>
+    </div>
+    <div class="feat-pg-card">
+      <div class="feat-pg-img"><img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&h=220&fit=crop&q=90" alt="Budget" onerror="this.parentNode.classList.add('feat-img-budget');this.remove()"/></div>
+      <div class="feat-pg-body"><span class="fpi">💰</span><h3>Budget Estimator</h3><p>Realistic daily cost breakdown — accommodation, food, transport, activities. Know your total trip budget upfront.</p><span class="feat-pg-tag">Smart Finance</span></div>
+    </div>
+    <div class="feat-pg-card">
+      <div class="feat-pg-img"><img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=600&h=220&fit=crop&q=90" alt="Phrasebook" onerror="this.parentNode.classList.add('feat-img-phrase');this.remove()"/></div>
+      <div class="feat-pg-body"><span class="fpi">🗣️</span><h3>Language Phrasebook</h3><p>12 key travel phrases in the local language. Click to copy to clipboard — save offline for no-wifi situations.</p><span class="feat-pg-tag">MyMemory API</span></div>
+    </div>
+  </div>
+  <footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Trip<span>Architect</span></div><div class="footer-creator"><span class="footer-made">Designed &amp; Built by</span><span class="footer-name">Gargi Patel</span></div><div class="footer-copy">© 2025 TripArchitect · All rights reserved</div></div></footer>
+</div>
+
+<!-- ══ PAGE: HOW IT WORKS ══ -->
+<div class="page" id="pg-howto">
+  <div class="page-hero" style="background-image:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&q=80')">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <div class="sec-tag" style="color:rgba(255,255,255,.7)">📖 Step-by-Step</div>
+      <h1>How to <em>Use It</em></h1>
+      <p>Get your perfect trip plan in under 2 minutes</p>
+    </div>
+  </div>
+  <div class="howto-wrap">
+    <div class="howto-steps">
+      <div class="hs">
+        <div class="hs-num">01</div>
+        <img class="hs-img" src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=300&h=180&fit=crop&q=90" alt="Plan trip"/>
+        <div class="hs-body">
+          <h3>Enter Your Trip Details</h3>
+          <p>Go to <strong>Plan My Trip</strong>, type your destination, pick travel dates, budget level and your trip style — adventure, culture, romance, food or relaxation.</p>
+        </div>
+      </div>
+      <div class="hs">
+        <div class="hs-num">02</div>
+        <img class="hs-img" src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=300&h=180&fit=crop&q=90" alt="AI builds plan"/>
+        <div class="hs-body">
+          <h3>AI Builds Your Perfect Plan</h3>
+          <p>Our Gemini AI crafts a complete day-by-day itinerary — real place names, morning/afternoon/evening activities, local tips, weather, maps, phrasebook and more.</p>
+        </div>
+      </div>
+      <div class="hs">
+        <div class="hs-num">03</div>
+        <img class="hs-img" src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=300&h=180&fit=crop&q=90" alt="Explore tabs"/>
+        <div class="hs-body">
+          <h3>Explore All 9 Tabs</h3>
+          <p>Browse your itinerary, live weather forecast, interactive map, country facts, local phrases, packing checklist, emergency numbers, budget breakdown and local festivals.</p>
+        </div>
+      </div>
+      <div class="hs">
+        <div class="hs-num">04</div>
+        <img class="hs-img" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=300&h=180&fit=crop&q=90" alt="Travel"/>
+        <div class="hs-body">
+          <h3>Download &amp; Travel!</h3>
+          <p>Download your itinerary as a .txt file or print as PDF. Screenshot the phrasebook for offline use. Pack your bags — your perfect trip is ready!</p>
+        </div>
+      </div>
+    </div>
+    <div class="howto-cta"><button class="cta-btn" onclick="showPage('start')">Ready? Plan Your Trip Now →</button></div>
+  </div>
+  <footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Trip<span>Architect</span></div><div class="footer-creator"><span class="footer-made">Designed &amp; Built by</span><span class="footer-name">Gargi Patel</span></div><div class="footer-copy">© 2025 TripArchitect · All rights reserved</div></div></footer>
+</div>
+
+<!-- ══ PAGE: CONTACT ══ -->
+<div class="page" id="pg-contact">
+  <div class="page-hero" style="background-image:url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1600&q=80')">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <div class="sec-tag" style="color:rgba(255,255,255,.7)">📬 Get In Touch</div>
+      <h1>Contact <em>Gargi Patel</em></h1>
+      <p>Questions, feedback, or just say hello!</p>
+    </div>
+  </div>
+  <div class="contact-wrap">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2>Let's <em>Connect</em></h2>
+        <p>Have questions about TripArchitect, found a bug, or want to collaborate? I'd love to hear from you!</p>
+        <div class="contact-links">
+          <div class="clink" onclick="window.location='mailto:gargiptl14@gmail.com'">
+            <span class="clink-icon">📧</span>
+            <div><strong>Primary Email</strong><span>gargiptl14&#64;gmail.com</span></div>
+          </div>
+          <div class="clink" onclick="window.location='mailto:gargipatel812@gmail.com'">
+            <span class="clink-icon">📨</span>
+            <div><strong>Alt Email</strong><span>gargipatel812&#64;gmail.com</span></div>
+          </div>
+          <div class="clink" onclick="showPage('start')"><span class="clink-icon">🗺️</span><div><strong>Try the App</strong><span>Plan a free trip now</span></div></div>
+        </div>
+      </div>
+      <div class="contact-form-card">
+        <h3>Send a Message</h3>
+        <div id="cform-wrap">
+          <div class="form-grid">
+            <div class="form-group"><label>Name</label><input class="inp" id="cf-name" placeholder="Your name"/></div>
+            <div class="form-group"><label>Email</label><input class="inp" id="cf-email" placeholder="email@example.com"/></div>
+            <div class="form-group full"><label>Subject</label><input class="inp" id="cf-subject" placeholder="Subject"/></div>
+            <div class="form-group full"><label>Message</label><textarea class="inp cform-ta" id="cf-msg" placeholder="Your message..."></textarea></div>
+          </div>
+          <button class="gen-btn" style="margin-top:8px;" onclick="sendMsg()">Send Message →</button>
+        </div>
+        <div class="msg-sent" id="msg-sent"><div style="font-size:48px;margin-bottom:12px;">🎉</div><p>Message sent! I'll get back to you soon.</p></div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer"><div class="footer-inner"><div class="footer-brand">Trip<span>Architect</span></div><div class="footer-creator"><span class="footer-made">Designed &amp; Built by</span><span class="footer-name">Gargi Patel</span></div><div class="footer-copy">© 2025 TripArchitect · All rights reserved</div></div></footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
