@@ -19,12 +19,14 @@ loadEnv();
 
 const PORT           = process.env.PORT || 3000;
 const COHERE_API_KEY = process.env.COHERE_API_KEY || "";
+// Treat placeholder as missing
+const KEY_IS_VALID   = COHERE_API_KEY.length > 10 && !COHERE_API_KEY.includes("your-");
 
 const PUBLIC_ENV = {
   APP_NAME:      process.env.APP_NAME    || "TripArchitect",
   AUTHOR:        process.env.AUTHOR      || "Gargi Patel",
   VERSION:       process.env.APP_VERSION || "1.0.0",
-  HAS_API_KEY:   !!COHERE_API_KEY,
+  HAS_API_KEY:   KEY_IS_VALID,
   WEATHER_GEO:   "https://geocoding-api.open-meteo.com/v1/search",
   WEATHER_API:   "https://api.open-meteo.com/v1/forecast",
   COUNTRY_API:   "https://restcountries.com/v3.1/name",
@@ -103,9 +105,9 @@ const server = http.createServer(async (req, res) => {
 
   // /api/test — quick health check for Cohere connection
   if (req.url === "/api/test" && req.method === "GET") {
-    if (!COHERE_API_KEY) {
+    if (!KEY_IS_VALID) {
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ ok: false, error: "COHERE_API_KEY not set in .env" }));
+      res.end(JSON.stringify({ ok: false, error: "COHERE_API_KEY not set or still placeholder in .env" }));
       return;
     }
     try {
@@ -121,9 +123,9 @@ const server = http.createServer(async (req, res) => {
 
   // /api/ai — Cohere proxy
   if (req.url === "/api/ai" && req.method === "POST") {
-    if (!COHERE_API_KEY) {
+    if (!KEY_IS_VALID) {
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "COHERE_API_KEY missing in .env — add it and restart server.js" }));
+      res.end(JSON.stringify({ error: "COHERE_API_KEY is missing or still set to placeholder in .env — get a real key at dashboard.cohere.com" }));
       return;
     }
     try {
@@ -159,7 +161,7 @@ server.listen(PORT, () => {
   console.log("═══════════════════════════════════════════════");
   console.log("  ✈️  TripArchitect is running!");
   console.log(`  🌍  http://localhost:${PORT}`);
-  console.log(`  🔑  Cohere Key: ${COHERE_API_KEY ? "✅ Loaded" : "❌ MISSING — add COHERE_API_KEY to .env"}`);
+  console.log(`  🔑  Cohere Key: ${KEY_IS_VALID ? "✅ Loaded" : "❌ MISSING — add real COHERE_API_KEY to .env"}`);
   console.log("  🛑  Ctrl+C to stop");
   console.log("═══════════════════════════════════════════════");
 });

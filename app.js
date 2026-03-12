@@ -258,8 +258,8 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function setStep(stepId, state) {
   const el = document.getElementById(stepId);
   if (!el) return;
-  el.classList.remove("active","done");
-  el.classList.add(state);
+  el.classList.remove("active", "done");
+  if (state) el.classList.add(state); // only add if non-empty
 }
 
 function setLoaderMsg(msg) {
@@ -271,9 +271,10 @@ function setLoaderMsg(msg) {
    MAIN GENERATE FUNCTION
 ══════════════════════════════════════ */
 async function generateTrip() {
-  // Check server has API key configured
-  if (typeof ENV === "undefined" || !ENV.HAS_API_KEY) {
-    alert("API key missing!\n\nOpen your .env file and set:\nCOHERE_API_KEY=your-key-here\n\nGet a free key at: dashboard.cohere.com\nThen restart server.js");
+  // Check server has real API key configured
+  const hasKey = (typeof ENV !== "undefined") && ENV.HAS_API_KEY;
+  if (!hasKey) {
+    alert("❌ API key missing!\n\nOpen your .env file and set:\nCOHERE_API_KEY=your-actual-key\n\nGet a FREE key at:\nhttps://dashboard.cohere.com/api-keys\n\nThen restart: node server.js");
     return;
   }
 
