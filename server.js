@@ -51,7 +51,7 @@ function readBody(req) {
 function cohereRequest(prompt, maxTokens) {
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify({
-      model: "command-r-plus",
+      model: "command-r-plus-08-2024",
       messages: [{ role: "user", content: prompt }],
       max_tokens: maxTokens || 2048,
       temperature: 0.7,
