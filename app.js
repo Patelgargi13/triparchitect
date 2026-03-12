@@ -271,8 +271,8 @@ function setLoaderMsg(msg) {
    MAIN GENERATE FUNCTION
 ══════════════════════════════════════ */
 async function generateTrip() {
-  const key = getApiKey();
-  if (!key) {
+  // Check server has API key configured
+  if (typeof ENV === "undefined" || !ENV.HAS_API_KEY) {
     alert("API key missing!\n\nOpen your .env file and set:\nCOHERE_API_KEY=your-key-here\n\nGet a free key at: dashboard.cohere.com\nThen restart server.js");
     return;
   }
@@ -296,11 +296,10 @@ async function generateTrip() {
   document.getElementById("loader").classList.add("show");
   document.getElementById("result-box").classList.remove("show");
   document.getElementById("export-row").classList.add("hidden");
-
-  // Reset steps
   ["lsb1","lsb2","lsb3","lsb4","lsb5","lsb6"].forEach(id => setStep(id, ""));
 
   try {
+    // ── Step 1: Non-AI calls (fast, parallel) ──
     setLoaderMsg("📍 Fetching destination info");
     setStep("lsb1","active");
     const [weatherData, countryData, phrases] = await Promise.all([
@@ -309,37 +308,44 @@ async function generateTrip() {
       fetchPhrases(dest),
     ]);
     setStep("lsb1","done");
+    console.log("✅ Step 1 done: weather/country/phrases");
 
+    // ── Step 2: Itinerary ──
     setLoaderMsg("✈️ Crafting your day-by-day itinerary");
     setStep("lsb2","active");
     const itinerary = await genItinerary(dest, days, travelers, budget, style, startDate, endDate);
     setStep("lsb2","done");
-    await sleep(1800);
+    console.log("✅ Step 2 done: itinerary");
 
+    // ── Step 3: Packing ──
     setLoaderMsg("🧳 Building your packing list");
     setStep("lsb3","active");
     const packingItems = await genPacking(dest, days, style);
     setStep("lsb3","done");
-    await sleep(1800);
+    console.log("✅ Step 3 done: packing");
 
+    // ── Step 4: Emergency ──
     setLoaderMsg("🚨 Gathering emergency contacts");
     setStep("lsb4","active");
     const emergencyData = await genEmergency(dest);
     setStep("lsb4","done");
-    await sleep(1800);
+    console.log("✅ Step 4 done: emergency");
 
+    // ── Step 5: Budget ──
     setLoaderMsg("💰 Estimating your budget");
     setStep("lsb5","active");
     const budgetData = await genBudget(dest, days, budget);
     setStep("lsb5","done");
-    await sleep(1800);
+    console.log("✅ Step 5 done: budget");
 
+    // ── Step 6: Festivals ──
     setLoaderMsg("🎉 Finding festivals & events");
     setStep("lsb6","active");
     const festivalsText = await genFestivals(dest, startDate, endDate);
     setStep("lsb6","done");
+    console.log("✅ Step 6 done: festivals");
 
-    // Render everything
+    // ── Render everything ──
     renderItinerary(itinerary, dest, days);
     renderWeather(weatherData, dest);
     renderCountry(countryData, dest);
@@ -350,7 +356,6 @@ async function generateTrip() {
     renderBudget(budgetData, days, budget);
     renderFestivals(festivalsText, dest);
 
-    // Result header
     const hdr = document.getElementById("result-dest-header");
     if (hdr) hdr.innerHTML = `✈ Your ${days}-day trip to <em style="font-style:italic;color:var(--gold2)">${escHtml(dest)}</em> is ready!`;
 
@@ -359,35 +364,47 @@ async function generateTrip() {
     document.getElementById("result-box").scrollIntoView({ behavior:"smooth" });
 
   } catch (err) {
-    console.error(err);
-    alert("Error: " + err.message + "\n\nTips:\n• Get a fresh free key at aistudio.google.com\n• Paste it in .env and restart server.js\n• Quota resets daily at midnight Pacific time");
+    console.error("❌ Trip generation error:", err);
+    alert("Something went wrong:\n\n" + err.message + "\n\nCheck:\n• Your .env has COHERE_API_KEY set\n• server.js is running\n• Open browser console (F12) for details");
+  } finally {
+    genBtn.disabled = false;
+    document.getElementById("loader").classList.remove("show");
   }
-
-  genBtn.disabled = false;
-  document.getElementById("loader").classList.remove("show");
 }
 
 /* ══════════════════════════════════════
-   API KEY
+   COHERE API CALL — proxied through server.js
+   Browser → /api/ai → server.js → api.cohere.com
 ══════════════════════════════════════ */
-function getApiKey() {
-  // Key is on server — just check if server says it's configured
-  return (typeof ENV !== "undefined" && ENV.HAS_API_KEY) ? "server" : "";
-}
+async function callCohere(prompt, _key, maxTokens) {
+  console.log("🤖 Calling /api/ai:", prompt.slice(0, 60) + "...");
 
-/* ══════════════════════════════════════
-   COHERE API CALL — via server proxy
-   (key stays secure on server.js, never in browser)
-══════════════════════════════════════ */
-async function callCohere(prompt, key, maxTokens) {
-  const res = await fetch("/api/ai", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt, maxTokens: maxTokens || 2048 }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || `Server error: ${res.status}`);
-  return data.text || "";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 90000); // 90s timeout
+
+  try {
+    const res = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, maxTokens: maxTokens || 2048 }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("❌ /api/ai error:", data);
+      throw new Error(data.error || `Server returned ${res.status}`);
+    }
+
+    console.log("✅ /api/ai response received, length:", data.text?.length);
+    return data.text || "";
+  } catch (e) {
+    clearTimeout(timeout);
+    if (e.name === "AbortError") throw new Error("Request timed out after 90 seconds");
+    throw e;
+  }
 }
 
 /* ══════════════════════════════════════

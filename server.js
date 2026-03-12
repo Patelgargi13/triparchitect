@@ -101,6 +101,24 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // /api/test — quick health check for Cohere connection
+  if (req.url === "/api/test" && req.method === "GET") {
+    if (!COHERE_API_KEY) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ ok: false, error: "COHERE_API_KEY not set in .env" }));
+      return;
+    }
+    try {
+      const text = await cohereRequest("Say only the word: WORKING", 10);
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ ok: true, response: text.trim() }));
+    } catch (e) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+    return;
+  }
+
   // /api/ai — Cohere proxy
   if (req.url === "/api/ai" && req.method === "POST") {
     if (!COHERE_API_KEY) {
