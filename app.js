@@ -273,7 +273,7 @@ function setLoaderMsg(msg) {
 async function generateTrip() {
   const key = getApiKey();
   if (!key) {
-    alert("API key missing!\n\nOpen your .env file and set:\nGEMINI_API_KEY=AIzaSy...\n\nThen restart server.js");
+    alert("API key missing!\n\nOpen your .env file and set:\nCOHERE_API_KEY=your-key-here\n\nGet a free key at: dashboard.cohere.com\nThen restart server.js");
     return;
   }
 
@@ -371,29 +371,34 @@ async function generateTrip() {
    API KEY
 ══════════════════════════════════════ */
 function getApiKey() {
-  return (typeof ENV !== "undefined" && ENV.GEMINI_API_KEY) ? ENV.GEMINI_API_KEY : "";
+  return (typeof ENV !== "undefined" && ENV.COHERE_API_KEY) ? ENV.COHERE_API_KEY : "";
 }
 
 /* ══════════════════════════════════════
-   GEMINI API CALL
+   COHERE API CALL
 ══════════════════════════════════════ */
-async function callGemini(prompt, key, maxTokens) {
+async function callCohere(prompt, key, maxTokens) {
   const apiKey = key || getApiKey();
-  const url = `${ENV.GEMINI_ENDPOINT}?key=${apiKey}`;
-  const res = await fetch(url, {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      contents:[{ parts:[{ text:prompt }] }],
-      generationConfig:{ temperature:0.7, maxOutputTokens: maxTokens || 2048 },
+  const res = await fetch(ENV.COHERE_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "command-r-plus",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: maxTokens || 2048,
+      temperature: 0.7,
     }),
   });
   if (!res.ok) {
     const e = await res.json().catch(() => ({}));
-    throw new Error(e.error?.message || `Gemini API error: ${res.status}`);
+    throw new Error(e.message || `Cohere API error: ${res.status}`);
   }
   const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  // Cohere v2 chat response: data.message.content[0].text
+  return data.message?.content?.[0]?.text || "";
 }
 
 /* ══════════════════════════════════════
@@ -415,7 +420,7 @@ DAY 2: [Theme]
 ...continue for all ${days} days
 
 Be specific: real place names, transport options, approximate timings. Make it exciting and practical!`;
-  return await callGemini(prompt, key);
+  return await callCohere(prompt, key);
 }
 
 /* ══════════════════════════════════════
@@ -510,7 +515,7 @@ async function fetchPhrases(dest) {
    AI: PACKING
 ══════════════════════════════════════ */
 async function genPacking(dest, days, style, key) {
-  const raw = await callGemini(
+  const raw = await callCohere(
     `Generate a packing list for a ${days}-day ${style} trip to ${dest}.
 Return ONLY a valid JSON array, no markdown, no backticks:
 [{"emoji":"👕","item":"T-shirts"},{"emoji":"👟","item":"Walking shoes"},...]
@@ -536,7 +541,7 @@ Include 18-20 items: clothing, footwear, toiletries, documents, tech, health, de
    AI: EMERGENCY
 ══════════════════════════════════════ */
 async function genEmergency(dest, key) {
-  const raw = await callGemini(
+  const raw = await callCohere(
     `Provide real emergency contact numbers for ${dest}.
 Return ONLY a valid JSON array, no markdown:
 [{"type":"Police","number":"100","emoji":"👮"},{"type":"Ambulance","number":"108","emoji":"🚑"},{"type":"Fire","number":"101","emoji":"🚒"},{"type":"Tourist Helpline","number":"1800","emoji":"ℹ️"},{"type":"General Emergency","number":"112","emoji":"🆘"}]
@@ -557,7 +562,7 @@ Use correct real numbers for the country.`, key, 300);
    AI: BUDGET
 ══════════════════════════════════════ */
 async function genBudget(dest, days, budgetLevel, key) {
-  const raw = await callGemini(
+  const raw = await callCohere(
     `Estimate realistic daily travel costs in USD for one person visiting ${dest} at ${budgetLevel} level.
 Return ONLY valid JSON, no markdown:
 {"accommodation":50,"food":30,"transport":15,"activities":20,"misc":10,"currency":"USD","note":"A helpful money tip"}`, key, 250);
@@ -569,7 +574,7 @@ Return ONLY valid JSON, no markdown:
    AI: FESTIVALS
 ══════════════════════════════════════ */
 async function genFestivals(dest, startDate, endDate, key) {
-  return await callGemini(
+  return await callCohere(
     `List local festivals, cultural events, public holidays and seasonal experiences in ${dest} around ${startDate} to ${endDate}.
 Use markdown with emojis. Include: event name, approximate dates, vivid description, what to expect, insider tip. Be enthusiastic and specific!`, key, 800);
 }
