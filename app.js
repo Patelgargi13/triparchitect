@@ -312,31 +312,31 @@ async function generateTrip() {
 
     setLoaderMsg("✈️ Crafting your day-by-day itinerary");
     setStep("lsb2","active");
-    const itinerary = await genItinerary(dest, days, travelers, budget, style, startDate, endDate, key);
+    const itinerary = await genItinerary(dest, days, travelers, budget, style, startDate, endDate);
     setStep("lsb2","done");
     await sleep(1800);
 
     setLoaderMsg("🧳 Building your packing list");
     setStep("lsb3","active");
-    const packingItems = await genPacking(dest, days, style, key);
+    const packingItems = await genPacking(dest, days, style);
     setStep("lsb3","done");
     await sleep(1800);
 
     setLoaderMsg("🚨 Gathering emergency contacts");
     setStep("lsb4","active");
-    const emergencyData = await genEmergency(dest, key);
+    const emergencyData = await genEmergency(dest);
     setStep("lsb4","done");
     await sleep(1800);
 
     setLoaderMsg("💰 Estimating your budget");
     setStep("lsb5","active");
-    const budgetData = await genBudget(dest, days, budget, key);
+    const budgetData = await genBudget(dest, days, budget);
     setStep("lsb5","done");
     await sleep(1800);
 
     setLoaderMsg("🎉 Finding festivals & events");
     setStep("lsb6","active");
-    const festivalsText = await genFestivals(dest, startDate, endDate, key);
+    const festivalsText = await genFestivals(dest, startDate, endDate);
     setStep("lsb6","done");
 
     // Render everything
@@ -371,34 +371,23 @@ async function generateTrip() {
    API KEY
 ══════════════════════════════════════ */
 function getApiKey() {
-  return (typeof ENV !== "undefined" && ENV.COHERE_API_KEY) ? ENV.COHERE_API_KEY : "";
+  // Key is on server — just check if server says it's configured
+  return (typeof ENV !== "undefined" && ENV.HAS_API_KEY) ? "server" : "";
 }
 
 /* ══════════════════════════════════════
-   COHERE API CALL
+   COHERE API CALL — via server proxy
+   (key stays secure on server.js, never in browser)
 ══════════════════════════════════════ */
 async function callCohere(prompt, key, maxTokens) {
-  const apiKey = key || getApiKey();
-  const res = await fetch(ENV.COHERE_ENDPOINT, {
+  const res = await fetch("/api/ai", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: "command-r-plus",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: maxTokens || 2048,
-      temperature: 0.7,
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt, maxTokens: maxTokens || 2048 }),
   });
-  if (!res.ok) {
-    const e = await res.json().catch(() => ({}));
-    throw new Error(e.message || `Cohere API error: ${res.status}`);
-  }
   const data = await res.json();
-  // Cohere v2 chat response: data.message.content[0].text
-  return data.message?.content?.[0]?.text || "";
+  if (!res.ok) throw new Error(data.error || `Server error: ${res.status}`);
+  return data.text || "";
 }
 
 /* ══════════════════════════════════════
