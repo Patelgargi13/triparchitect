@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TripArchitect — by Gargi Patel</title>
+  <title>TripArchitect — AI Travel Planning by Gargi Patel</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <link rel="stylesheet" href="style.css"/>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
-<link rel="icon" type="image/png" href="/favicon.png"/>
 </head>
 <body>
 
@@ -40,13 +38,24 @@
 <nav id="main-nav">
   <div class="nav-inner">
     <div class="nav-brand" onclick="showPage('home')"><span class="brand-icon">✈</span>Trip<span>Architect</span></div>
-    <div class="nav-links">
-      <button class="nl active" id="nav-home"     onclick="showPage('home')">Home</button>
-      <button class="nl"        id="nav-features" onclick="showPage('features')">Features</button>
-      <button class="nl"        id="nav-howto"    onclick="showPage('howto')">How It Works</button>
-      <button class="nl"        id="nav-contact"  onclick="showPage('contact')">Contact</button>
-      <button class="nl cta"    id="nav-start"    onclick="showPage('start')">Plan My Trip →</button>
+    <div class="nav-links" id="nav-links">
+      <button class="nl active" id="nav-home"     onclick="showPage('home');closeMobileNav()">Home</button>
+      <button class="nl"        id="nav-features" onclick="showPage('features');closeMobileNav()">Features</button>
+      <button class="nl"        id="nav-howto"    onclick="showPage('howto');closeMobileNav()">How It Works</button>
+      <button class="nl"        id="nav-contact"  onclick="showPage('contact');closeMobileNav()">Contact</button>
+      <button class="nl cta"    id="nav-start"    onclick="showPage('start');closeMobileNav()">Plan My Trip →</button>
     </div>
+    <button class="nav-burger" id="nav-burger" onclick="toggleMobileNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <!-- Mobile dropdown -->
+  <div class="mobile-menu" id="mobile-menu">
+    <button onclick="showPage('home');closeMobileNav()">🏠 Home</button>
+    <button onclick="showPage('features');closeMobileNav()">✨ Features</button>
+    <button onclick="showPage('howto');closeMobileNav()">📖 How It Works</button>
+    <button onclick="showPage('contact');closeMobileNav()">📬 Contact</button>
+    <button class="mobile-cta" onclick="showPage('start');closeMobileNav()">✈ Plan My Trip — Free</button>
   </div>
 </nav>
 
